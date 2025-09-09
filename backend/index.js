@@ -5,6 +5,7 @@ import connectDb from "./config/db.js"
 import cookieParser from "cookie-parser"
 
 import authRouter from "./routes/auth.routes.js"
+import userRouter from "./routes/user.routes.js"
 dotenv.config()
 import cors from "cors"
 
@@ -21,6 +22,7 @@ const port=process.env.PORT || 5000
 app.use(express.json())
 app.use(cookieParser())
 app.use("/api/auth", authRouter)
+app.use("/api/user", userRouter)
 
 
 
@@ -28,5 +30,5 @@ app.use("/api/auth", authRouter)
 
 app.listen(port,() =>{
     connectDb()
-    console.log("server started")
-})
+    console.log(`server started on ${port}`)
+  })

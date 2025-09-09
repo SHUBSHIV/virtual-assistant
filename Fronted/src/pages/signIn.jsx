@@ -2,32 +2,39 @@ import React, { useState, useContext } from 'react';
 import bg from '../assets/authbg.png';
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
-import { userDataContext } from '../context/userContext';
+import { userDataContext } from '../context/UserContext';
 import axios from 'axios';
 
 function SignIn() {
     const [showPassword, setShowPassword] = useState(false);
-    const { serverUrl } = useContext(userDataContext);
+    const { serverUrl,userData, setUserData } = useContext(userDataContext);
     const navigate = useNavigate();
     
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [err, setErr] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSignIn = async (e) => {
         e.preventDefault();
         setErr('');
+        setLoading(true);
         try {
             const result = await axios.post(`${serverUrl}/api/auth/signin`, { email, password }, { withCredentials: true });
             
             // Console user data
-            console.log("Logged in user:", result.data.user);
+           setUserData(result.data)
+             localStorage.setItem('user', JSON.stringify(result.data.user));
 
             // Optional: redirect after login
             // navigate('/dashboard');
+            setLoading(false);
+            navigate("/")
 
         } catch (error) {
             console.log("Signin error:", error);
+            setUserData(null)
+            setLoading(false);
             setErr(error.response?.data?.message || "Something went wrong");
         }
     }
@@ -64,7 +71,7 @@ function SignIn() {
 
                 {err.length > 0 && <p className='text-red-500 text-[17px]'>*{err}</p>}
 
-                <button className='min-w-[150px] h-[60px] mt-[30px] text-white font-semibold bg-white rounded-full text-[19px]'>Sign In</button>
+                <button className='min-w-[150px] h-[60px] mt-[30px] text-black font-semibold bg-white rounded-full text-[19px]' disabled={loading}>{loading?"Loading...":"Sign In"}</button>
 
                 <p className='text-white text-[18px] cursor-pointer' onClick={() => navigate("/signup")}>
                     Want to create new account? <span className='text-blue-400 cursor-pointer'>Sign Up</span>

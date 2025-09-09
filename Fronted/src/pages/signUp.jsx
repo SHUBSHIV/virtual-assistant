@@ -2,22 +2,24 @@ import React, { useState, useContext } from "react";
 import bg from "../assets/authbg.png";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { userDataContext } from "../context/userContext";
+import { userDataContext } from "../context/UserContext";
 import axios from "axios";
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
-  const { serverUrl } = useContext(userDataContext);
+  const { serverUrl,userData, setUserData } = useContext(userDataContext);
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     setErr("");
+    setLoading(true);
 
     console.log("Submitting signup:", { name, email, password });
 
@@ -35,12 +37,17 @@ function SignUp() {
           headers: { "Content-Type": "application/json" },
         }
       );
+      
 
-      console.log("Signup success:", result.data);
+      setUserData(result.data)
       // Signup success → navigate to signin page
       navigate("/signin");
+      setLoading(false);
+      navigate("/customize")
     } catch (error) {
       console.error("Signup error:", error.response?.data);
+      setUserData(null)
+      setLoading(false);
       setErr(error.response?.data?.message || "Something went wrong");
     }
   };
@@ -102,8 +109,7 @@ function SignUp() {
           <p className="text-red-500 text-[17px] text-center w-full">*{err}</p>
         )}
 
-        <button className="min-w-[150px] h-[60px] mt-[30px] text-white font-semibold bg-white rounded-full text-[19px]">
-          Sign Up
+        <button className="min-w-[150px] h-[60px] mt-[30px] text-black font-semibold bg-white rounded-full text-[19px]" disabled={loading}>{loading?"Loading...":"Sign Up"}
         </button>
 
         <p
