@@ -1,4 +1,4 @@
-import React, { createContext, useState ,useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 export const userDataContext = createContext();
@@ -6,17 +6,32 @@ export const userDataContext = createContext();
 function UserContext({ children }) {
   const serverUrl = "http://localhost:5000";
   const [userData, setUserData] = useState(null);
-   const [frontendImage,setFrontendImage] =useState(null)
-    const [backendImage,setBackendImage] =useState(null)
-    const [selectedImage, setSelectedImage] = useState(null)
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [frontendImage, setFrontendImage] = useState(null);
+  const [backendImage, setBackendImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleCurrentUser = async () => {
     try {
+      setLoading(true);
       const result = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true });
-      setUserData(result.data);
-      console.log(result.data);
+      
+      // Only set userData if we actually get user data back
+      if (result.data && result.data._id) {
+        setUserData(result.data);
+        console.log('User found:', result.data);
+      } else {
+        setUserData(null);
+        console.log('No user data received');
+      }
     } catch (error) {
-      console.log(error);
+      console.log('Error fetching current user:', error.response?.status);
+      // If error is 401 (unauthorized) or 404, user is not logged in
+      if (error.response?.status === 401 || error.response?.status === 404) {
+        setUserData(null);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -25,8 +40,16 @@ function UserContext({ children }) {
   }, []);
 
   const value = {
-    serverUrl,userData,setUserData,backendImage,setBackendImage,
-    frontendImage,setFrontendImage,selectedImage,setSelectedImage// optional: so other components can update
+    serverUrl,
+    userData,
+    setUserData,
+    loading, // Add loading to context
+    backendImage,
+    setBackendImage,
+    frontendImage,
+    setFrontendImage,
+    selectedImage,
+    setSelectedImage
   };
 
   return (

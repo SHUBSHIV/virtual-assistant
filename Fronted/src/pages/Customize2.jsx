@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 function Customize2() {
     const { userData,backendImage,selectedImage,serverUrl,setUserData} = useContext(userDataContext)
     const [assistantName, setAssistantName] = useState(userData?.AssistantName || "")
+   
 
     const handleUpdateAssistant = async () =>{
         try{
@@ -37,9 +38,10 @@ function Customize2() {
                 required onChange={(e) => setAssistantName(e.target.value)} value={assistantName} />
 
             {assistantName && <button className="min-w-[300px] h-[60px] mt-[20px] text-black font-semibold cursor-pointer
-                     bg-white rounded-full text-[19px]" onClick={() =>{ 
+                     bg-white rounded-full text-[19px]" onClick={()=>{ 
                         handleUpdateAssistant()
-                     }}>Finally Create Your Assistant</button>}
+                     }
+                     }>Finally Create Your Assistant</button>}
 
 
         </div>
