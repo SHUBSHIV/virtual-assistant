@@ -1,44 +1,40 @@
 import uploadOnCloudinary from "../config/cloudinary.js"
 import User from "../models/user.model.js"
+
 export const getCurrentUser = async (req, res) => {
-    try{
+    try {
         const userId = req.userId;
         const user = await User.findById(userId).select("-password");
-        if(!user){
+        if (!user) {
             return res.status(404).json({message: "user not found"})
         }
-        return res.status(200).json({user})
+        return res.status(200).json(user)  // Fixed: return user directly, not wrapped in object
 
-    }catch(error){
-        return res.status(400).json({message: " get current user error"})
-
+    } catch (error) {
+        return res.status(400).json({message: "get current user error"})
     }
 }
 
-export const updateAssistant=async (req, res) =>{
-    try{
-        const{assistantName, imageUrl}=req.body
+export const updateAssistant = async (req, res) => {
+    try {
+        const { assistantName, imageUrl } = req.body
         let assistantImage;
-if (req.file) {
-    assistantImage = await uploadOnCloudinary(req.file.path);
-} else {
-    assistantImage = imageUrl
-}
 
+        if (req.file) {
+            assistantImage = await uploadOnCloudinary(req.file.path);
+        } else {
+            assistantImage = imageUrl
+        }
 
+        const user = await User.findByIdAndUpdate(req.userId, {
+            assistantName, 
+            assistantImage
+        }, { new: true }).select("-password")
+        
+        return res.status(200).json(user)
 
-
-const user = await User.findByIdAndUpdate(req.userId,{
-    assistantName, assistantImage
-},{new:true}).select("-password")
-return res.status(200).json(user)
-
-
-
-
-    }catch(error){
-         return res.status(400).json({message: "updateAssistantError user error"})
-
-
-  }
+    } catch (error) {
+        console.log(error)  // Added for debugging
+        return res.status(400).json({message: "updateAssistant error"})
+    }
 }

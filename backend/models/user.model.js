@@ -14,9 +14,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    asssistantName: {
+    assistantName: {
         type: String,
     },
+
+    assistantImage: {  // Added missing field
+        type: String,
+    },
+    
     history: [
         { type: String }
     ]
